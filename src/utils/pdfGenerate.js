@@ -1,12 +1,23 @@
-import React from "react";
+import React, { useState, useRef } from "react";
 import { jsPDF } from "jspdf";
+import html2canvas from "html2canvas"
+import InputToPdf from "../components/InputToPdf/InputToPdf";
 
-export default function GeneratePdf() {
-  const handleRenderPdf = () => {
+export default function GeneratePdf({ data }) {
+  const [imageUrl, setImageUrl] = useState("");
+
+  const componentRef = useRef();
+
+  const handleRenderPdf = async () => {
+    const canvas = await html2canvas(componentRef.current);
+    const dataUrl = canvas.toDataURL();
+
+    setImageUrl(dataUrl);
+
     const doc = new jsPDF();
 
     // Add logo
-    doc.addImage("https://www.example.com/logo.png", "PNG", 10, 10, 50, 50);
+    doc.addImage("https://github.com/austinslatey/RecipEase/blob/main/assets/images/newREADMEimg.jpg", "JPG", 10, 10, 50, 50);
 
     // Add company details
     doc.setFontSize(14);
@@ -21,8 +32,8 @@ export default function GeneratePdf() {
     doc.setFontSize(16);
     doc.text("Invoice", 10, 80);
     doc.setFontSize(12);
-    doc.text("Invoice Number: INV-001", 10, 90);
-    doc.text("Invoice Date: 01/01/2022", 10, 95);
+    doc.text(`Invoice Number: ${data.invoiceNumber}`, 10, 90);
+    doc.text(`Invoice Date: ${data.invoiceDate}`, 10, 95);
 
     // Add table headers
     doc.setFontSize(14);
@@ -32,23 +43,9 @@ export default function GeneratePdf() {
     doc.text("Total", 170, 120);
 
     // Add table rows
-    const items = [
-      {
-        description: "Item 1",
-        rate: 10,
-        qty: 2,
-        total: 20,
-      },
-      {
-        description: "Item 2",
-        rate: 20,
-        qty: 1,
-        total: 20,
-      },
-    ];
     let y = 130;
     let subtotal = 0;
-    items.forEach((item) => {
+    data.items.forEach((item) => {
       doc.text(item.description, 10, y);
       doc.text(item.rate.toString(), 100, y);
       doc.text(item.qty.toString(), 140, y);
@@ -81,7 +78,11 @@ export default function GeneratePdf() {
 
   return (
     <div>
-      <button onClick={handleRenderPdf}>Render PDF</button>
+      <button >Render PDF</button>
+      <div ref={componentRef}>
+        {<InputToPdf onClick={handleRenderPdf}/>}
+      </div>
+      {imageUrl && <img src={imageUrl} alt="Preview" />}
     </div>
   );
 }

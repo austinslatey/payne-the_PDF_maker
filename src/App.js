@@ -5,29 +5,26 @@ import AppBar from "./components/AppBar/AppBar";
 import './index.css';
 
 function App() {
-    const [currentPage, setCurrentPage] = useState("Home");
+  const [currentPage, setCurrentPage] = useState("HomePage");
 
-    const handlePageChange = (page) => {
-      setCurrentPage(page);
-    };
-  
-    const renderPage = () => {
-      if (currentPage === "Home") {
-        return <Home />;
-      }  else {
-        return <Input />;
-      }
-    };
-  
-    return (
-      <div>
-        <AppBar
-          currentPage={currentPage}
-          handlePageChange={handlePageChange}
-        /> 
-        {renderPage()}
-      </div>
-    );
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+
+  return (
+    <div>
+      <AppBar
+        currentPage={currentPage}
+        handlePageChange={handlePageChange}
+      />
+      {currentPage === "HomePage" ? (
+        <Home />
+      ) : (
+        <Input />
+      )}
+    </div>
+  );
 }
 
 export default App;
