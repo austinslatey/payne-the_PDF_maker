@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './InputPage.css';
-import GeneratePdf from '../../../utils/pdfGenerate';
+import InputToPdf from '../../../utils/pdfGenerate';
 
 function InputPage() {
   const [price, setPrice] = useState('');
@@ -48,7 +48,7 @@ function InputPage() {
           </button>
         </form>
       ) : (
-        <GeneratePdf price={price} quantity={quantity} />
+        <InputToPdf price={price} quantity={quantity} />
       )}
     </div>
   );

@@ -1,10 +1,27 @@
 import React, { useState, useRef } from "react";
 import { jsPDF } from "jspdf";
-import html2canvas from "html2canvas"
-import InputToPdf from "../components/InputToPdf/InputToPdf";
+import html2canvas from "html2canvas";
+import InputPage from "../components/pages/InputPage/InputPage";
 
-export default function GeneratePdf({ data }) {
+export default function GeneratePdf() {
   const [imageUrl, setImageUrl] = useState("");
+  const [price, setPrice] = useState("");
+  const [quantity, setQuantity] = useState("");
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    // Perform some action with the form data here
+  };
+  const handleQuantityChange = (event) => {
+    event.preventDefault();
+    // Perform some action with the form data here
+    setPrice(event.target.value);
+  };
+
+  const handlePriceChange = (event) => {
+    event.preventDefault();
+    // Perform some action with the form data here
+    setQuantity(event.target.value);
+  };
 
   const componentRef = useRef();
 
@@ -16,8 +33,15 @@ export default function GeneratePdf({ data }) {
 
     const doc = new jsPDF();
 
-    // Add logo
-    doc.addImage("https://github.com/austinslatey/RecipEase/blob/main/assets/images/newREADMEimg.jpg", "JPG", 10, 10, 50, 50);
+    // // Add logo
+    // doc.addImage(
+    //   "https://github.com/austinslatey/RecipEase/blob/main/assets/images/newREADMEimg.jpg",
+    //   "JPG",
+    //   10,
+    //   10,
+    //   50,
+    //   50
+    // );
 
     // Add company details
     doc.setFontSize(14);
@@ -32,8 +56,8 @@ export default function GeneratePdf({ data }) {
     doc.setFontSize(16);
     doc.text("Invoice", 10, 80);
     doc.setFontSize(12);
-    doc.text(`Invoice Number: ${data.invoiceNumber}`, 10, 90);
-    doc.text(`Invoice Date: ${data.invoiceDate}`, 10, 95);
+    doc.text(`Invoice Number: 001`, 10, 90);
+    doc.text(`Invoice Date: ${new Date().toLocaleDateString()}`, 10, 95);
 
     // Add table headers
     doc.setFontSize(14);
@@ -44,45 +68,52 @@ export default function GeneratePdf({ data }) {
 
     // Add table rows
     let y = 130;
-    let subtotal = 0;
-    data.items.forEach((item) => {
-      doc.text(item.description, 10, y);
-      doc.text(item.rate.toString(), 100, y);
-      doc.text(item.qty.toString(), 140, y);
-      doc.text(item.total.toString(), 170, y);
-      y += 10;
-      subtotal += item.total;
-    });
+    const rate = parseFloat(price);
+    const qty = parseFloat(quantity);
+    const total = rate * qty;
+    doc.text("Product", 10, y);
+    doc.text(rate.toFixed(2).toString(), 100, y);
+    doc.text(qty.toFixed(2).toString(), 140, y);
+    doc.text(total.toFixed(2).toString(), 170, y);
+    y += 10;
 
     // Add subtotal
     doc.setFontSize(12);
     doc.text("Subtotal:", 140, y);
-    doc.text(subtotal.toString(), 170, y);
+    doc.text(total.toFixed(2).toString(), 170, y);
     y += 10;
 
     // Add tax
     const taxRate = 0.1;
-    const taxAmount = subtotal * taxRate;
+    const taxAmount = total * taxRate;
     doc.text(`Tax (${(taxRate * 100).toFixed(0)}%):`, 140, y);
-    doc.text(taxAmount.toFixed(2), 170, y);
+    doc.text(taxAmount.toFixed(2).toString(), 170, y);
     y += 10;
 
     // Add total
-    const total = subtotal + taxAmount;
+    const grandTotal = total + taxAmount;
     doc.setFontSize(16);
     doc.text("Total:", 140, y);
-    doc.text(total.toFixed(2), 170, y);
+    doc.text(grandTotal.toFixed(2).toString(), 170, y);
 
     doc.save("invoice.pdf");
   };
-
   return (
     <div>
-      <button >Render PDF</button>
-      <div ref={componentRef}>
-        {<InputToPdf onClick={handleRenderPdf}/>}
-      </div>
-      {imageUrl && <img src={imageUrl} alt="Preview" />}
+      <button onClick={handleRenderPdf}>Render PDF</button>
+      {!imageUrl ? (
+        <div ref={componentRef}>
+          <InputPage
+            price={price}
+            quantity={quantity}
+            onSubmit={handleSubmit}
+            onPriceChange={handlePriceChange}
+            onQuantityChange={handleQuantityChange}
+          />
+        </div>
+      ) : (
+        console.log('deezNutz')
+      )}
     </div>
   );
-}
+      }
